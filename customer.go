@@ -88,6 +88,16 @@ func (customers *Customers) findCustomerByPersonalID(PersonalID int) *Customer {
 	return nil
 }
 
+func (customers *Customers) validateIdx(idx int) error {
+	c := *customers
+
+	if idx < 0 || idx >= len(c) {
+		return errors.New("error: idx is out of range")
+	}
+
+	return nil
+}
+
 func (customers *Customers) AddCustomer(FirstName, LastName, PhoneNumber, Email string, PersonalID int) error {
 	duplicatedCustomer := customers.findCustomerByPersonalID(PersonalID)
 
@@ -115,5 +125,16 @@ func (customers *Customers) AddCustomer(FirstName, LastName, PhoneNumber, Email 
 	*customers = append(*customers, newCustomer)
 
 	return nil
+}
 
+func (customers *Customers) DeleteCustomerByIdx(idx int) error {
+	c := *customers
+	validatedIdx := c.validateIdx(idx)
+
+	if validatedIdx == nil {
+		*customers = append(c[:idx], c[idx+1:]...)
+		return nil
+	}
+
+	return fmt.Errorf("unsuccessful validation of idx %v", idx)
 }
