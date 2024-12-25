@@ -36,20 +36,20 @@ func intLength(number int) int {
 	return length
 }
 
-func (customers *Customers) validateInput(FirstName, LastName, PhoneNumber, Email string, PersonalID int) error {
-	if FirstName == "" || len(FirstName) <= 3 {
+func (customers *Customers) validateInput(firstName, lastName, phoneNumber, email string, personalID int) error {
+	if firstName == "" || len(firstName) <= 3 {
 		return errors.New("invalid input: first name cannot be empty or shorter than 3 characters")
 	}
 
-	if LastName == "" || len(LastName) <= 3 {
+	if lastName == "" || len(lastName) <= 3 {
 		return errors.New("invalid input: last name cannot be empty or shorter than 3 characters")
 	}
 
-	if PhoneNumber == "" || len(PhoneNumber) < 7 {
+	if phoneNumber == "" || len(phoneNumber) < 7 {
 		return errors.New("invalid input: phone number cannot be empty or shorter than 7")
 	}
 
-	for _, char := range PhoneNumber {
+	for _, char := range phoneNumber {
 		isChar := unicode.IsLetter(char)
 
 		if isChar {
@@ -57,17 +57,17 @@ func (customers *Customers) validateInput(FirstName, LastName, PhoneNumber, Emai
 		}
 	}
 
-	if Email == "" || len(Email) < 7 {
+	if email == "" || len(email) < 7 {
 		return errors.New("invalid input: email cannot be empty or shorter than 7 characters")
 	}
 
-	_, err := mail.ParseAddress(Email)
+	_, err := mail.ParseAddress(email)
 
 	if err != nil {
 		return fmt.Errorf("invalid %v", err)
 	}
 
-	personalIDLen := intLength(PersonalID)
+	personalIDLen := intLength(personalID)
 
 	if personalIDLen != 11 {
 		return errors.New("invalid input: personal id of the customer must be exactly 11 digits")
@@ -86,11 +86,11 @@ func (customers *Customers) validateIdx(idx int) error {
 	return nil
 }
 
-func (customers *Customers) FindCustomerByPersonalID(PersonalID int) (*Customer, int) {
+func (customers *Customers) FindCustomerByPersonalID(personalID int) (*Customer, int) {
 	c := *customers
 
 	for idx, customer := range c {
-		if customer.PersonalID == PersonalID {
+		if customer.PersonalID == personalID {
 			return &c[idx], idx
 		}
 	}
@@ -98,25 +98,25 @@ func (customers *Customers) FindCustomerByPersonalID(PersonalID int) (*Customer,
 	return nil, -1
 }
 
-func (customers *Customers) AddCustomer(FirstName, LastName, PhoneNumber, Email string, PersonalID int) error {
-	duplicatedCustomer, _ := customers.FindCustomerByPersonalID(PersonalID)
+func (customers *Customers) AddCustomer(firstName, lastName, phoneNumber, email string, personalID int) error {
+	duplicatedCustomer, _ := customers.FindCustomerByPersonalID(personalID)
 
 	if duplicatedCustomer != nil {
 		return errors.New("error: duplicated customer found")
 	}
 
-	validatedCustomer := customers.validateInput(FirstName, LastName, PhoneNumber, Email, PersonalID)
+	validatedCustomer := customers.validateInput(firstName, lastName, phoneNumber, email, personalID)
 
 	if validatedCustomer != nil {
 		return validatedCustomer
 	}
 
 	newCustomer := Customer{
-		FirstName:    FirstName,
-		LastName:     LastName,
-		PersonalID:   PersonalID,
-		PhoneNumber:  PhoneNumber,
-		Email:        Email,
+		FirstName:    firstName,
+		LastName:     lastName,
+		PersonalID:   personalID,
+		PhoneNumber:  phoneNumber,
+		Email:        email,
 		RentedCars:   []Vehicle{},
 		CreatedAt:    time.Now(),
 		LastEditedAt: nil,
@@ -139,13 +139,13 @@ func (customers *Customers) DeleteCustomerByIdx(idx int) error {
 	return fmt.Errorf("unsuccessful validation of idx %v", idx)
 }
 
-func (customers *Customers) DeleteCustomerByPersonalID(PersonalID int) error {
+func (customers *Customers) DeleteCustomerByPersonalID(personalID int) error {
 	c := *customers
-	foundCustomer, idx := c.FindCustomerByPersonalID(PersonalID)
+	foundCustomer, idx := c.FindCustomerByPersonalID(personalID)
 
 	if foundCustomer == nil {
 		fmt.Println("Customer not found")
-		return fmt.Errorf("customer with PersonalID %d not found", PersonalID)
+		return fmt.Errorf("customer with PersonalID %d not found", personalID)
 	}
 
 	*customers = append(c[:idx], c[idx+1:]...)
@@ -153,25 +153,25 @@ func (customers *Customers) DeleteCustomerByPersonalID(PersonalID int) error {
 	return nil
 }
 
-func (customers *Customers) EditCustomerContacts(PersonalID int, PhoneNumber, Email string) error {
+func (customers *Customers) EditCustomerContacts(personalID int, phoneNumber, email string) error {
 	fmt.Println("EditCustomerContacts running...")
 	c := *customers
 
-	customer, idx := c.FindCustomerByPersonalID(PersonalID)
+	customer, idx := c.FindCustomerByPersonalID(personalID)
 
 	if idx == -1 && customer == nil {
 		fmt.Println("Customer not found")
-		return fmt.Errorf("Customer not found by PersonalID %d", PersonalID)
+		return fmt.Errorf("Customer not found by PersonalID %d", personalID)
 	}
 
-	if PhoneNumber != "" && len(PhoneNumber) >= 7 {
-		customer.PhoneNumber = PhoneNumber
+	if phoneNumber != "" && len(phoneNumber) >= 7 {
+		customer.PhoneNumber = phoneNumber
 	}
 
-	_, err := mail.ParseAddress(Email)
+	_, err := mail.ParseAddress(email)
 
-	if Email != "" && len(Email) >= 7 && err == nil {
-		customer.Email = Email
+	if email != "" && len(email) >= 7 && err == nil {
+		customer.Email = email
 	}
 
 	return nil
