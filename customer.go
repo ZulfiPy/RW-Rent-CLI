@@ -91,7 +91,7 @@ func (customers *Customers) FindCustomerByPersonalID(PersonalID int) (*Customer,
 
 	for idx, customer := range c {
 		if customer.PersonalID == PersonalID {
-			return &customer, idx
+			return &c[idx], idx
 		}
 	}
 
@@ -149,6 +149,30 @@ func (customers *Customers) DeleteCustomerByPersonalID(PersonalID int) error {
 	}
 
 	*customers = append(c[:idx], c[idx+1:]...)
+
+	return nil
+}
+
+func (customers *Customers) EditCustomerContacts(PersonalID int, PhoneNumber, Email string) error {
+	fmt.Println("EditCustomerContacts running...")
+	c := *customers
+
+	customer, idx := c.FindCustomerByPersonalID(PersonalID)
+
+	if idx == -1 && customer == nil {
+		fmt.Println("Customer not found")
+		return fmt.Errorf("Customer not found by PersonalID %d", PersonalID)
+	}
+
+	if PhoneNumber != "" && len(PhoneNumber) >= 7 {
+		customer.PhoneNumber = PhoneNumber
+	}
+
+	_, err := mail.ParseAddress(Email)
+
+	if Email != "" && len(Email) >= 7 && err == nil {
+		customer.Email = Email
+	}
 
 	return nil
 }
