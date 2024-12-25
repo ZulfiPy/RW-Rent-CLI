@@ -76,18 +76,6 @@ func (customers *Customers) validateInput(FirstName, LastName, PhoneNumber, Emai
 	return nil
 }
 
-func (customers *Customers) findCustomerByPersonalID(PersonalID int) *Customer {
-	c := *customers
-
-	for _, customer := range c {
-		if customer.PersonalID == PersonalID {
-			return &customer
-		}
-	}
-
-	return nil
-}
-
 func (customers *Customers) validateIdx(idx int) error {
 	c := *customers
 
@@ -98,8 +86,20 @@ func (customers *Customers) validateIdx(idx int) error {
 	return nil
 }
 
+func (customers *Customers) FindCustomerByPersonalID(PersonalID int) (*Customer, int) {
+	c := *customers
+
+	for idx, customer := range c {
+		if customer.PersonalID == PersonalID {
+			return &customer, idx
+		}
+	}
+
+	return nil, -1
+}
+
 func (customers *Customers) AddCustomer(FirstName, LastName, PhoneNumber, Email string, PersonalID int) error {
-	duplicatedCustomer := customers.findCustomerByPersonalID(PersonalID)
+	duplicatedCustomer, _ := customers.FindCustomerByPersonalID(PersonalID)
 
 	if duplicatedCustomer != nil {
 		return errors.New("error: duplicated customer found")
@@ -137,4 +137,18 @@ func (customers *Customers) DeleteCustomerByIdx(idx int) error {
 	}
 
 	return fmt.Errorf("unsuccessful validation of idx %v", idx)
+}
+
+func (customers *Customers) DeleteCustomerByPersonalID(PersonalID int) error {
+	c := *customers
+	foundCustomer, idx := c.FindCustomerByPersonalID(PersonalID)
+
+	if foundCustomer == nil {
+		fmt.Println("Customer not found")
+		return fmt.Errorf("customer with PersonalID %d not found", PersonalID)
+	}
+
+	*customers = append(c[:idx], c[idx+1:]...)
+
+	return nil
 }
