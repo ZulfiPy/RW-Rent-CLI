@@ -24,7 +24,6 @@ type Vehicle struct {
 type Vehicles map[string]Vehicle
 
 func (vehicles *Vehicles) validateVehicle(input Vehicle) error {
-	fmt.Println("validation of vehicle input...", input)
 	var fuelType = []string{"Petrol", "Diesel", "Hybrid", "Electric", "LPG", "CNG"}
 	var gearbox = []string{"Automatic", "Manual"}
 	var colors = []string{"White", "Black", "Red", "Blue", "Green", "Yellow", "Gray", "Silver", "Brown"}
@@ -94,7 +93,6 @@ func (vehicles *Vehicles) ensureAbsence(plateNumber string) error {
 }
 
 func (vehicles *Vehicles) AddVehicle(input Vehicle) error {
-	fmt.Println("I run in AddVehicle")
 	v := *vehicles
 	validatedVehicle := v.validateVehicle(input)
 
