@@ -112,3 +112,16 @@ func (vehicles *Vehicles) AddVehicle(input Vehicle) error {
 
 	return nil
 }
+
+func (vehicles *Vehicles) DeleteVehicle(plateNumber string) error {
+	v := *vehicles
+	vehiclePersists := v.ensureAbsence(plateNumber)
+
+	if vehiclePersists == nil {
+		return fmt.Errorf("Vehicle with plate number %v doesn't persist in vehicles", plateNumber)
+	}
+
+	delete(v, plateNumber)
+
+	return nil
+}
