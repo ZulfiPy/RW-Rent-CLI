@@ -176,3 +176,22 @@ func (customers *Customers) EditCustomerContacts(personalID int, phoneNumber, em
 
 	return nil
 }
+
+func (customers *Customers) AddVehicleToCustomer(personalID int, plateNumber string, vehicles Vehicles) error {
+	c := *customers
+
+	customer, idx := c.FindCustomerByPersonalID(personalID)
+	vehiclePersists := vehicles.ensureAbsence(plateNumber)
+
+	if customer == nil && idx == -1 {
+		return fmt.Errorf("Customer with personalID %v doesn't pesists", personalID)
+	}
+
+	if vehiclePersists == nil {
+		return fmt.Errorf("Vehicle with plate number %v doesn't persist", plateNumber)
+	}
+
+	customer.RentedCars = append(customer.RentedCars, vehicles[plateNumber])
+
+	return nil
+}
