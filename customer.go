@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/mail"
+	"slices"
 	"time"
 	"unicode"
 )
@@ -154,7 +155,6 @@ func (customers *Customers) DeleteCustomerByPersonalID(personalID int) error {
 }
 
 func (customers *Customers) EditCustomerContacts(personalID int, phoneNumber, email string) error {
-	fmt.Println("EditCustomerContacts running...")
 	c := *customers
 
 	customer, idx := c.FindCustomerByPersonalID(personalID)
@@ -181,17 +181,50 @@ func (customers *Customers) AddVehicleToCustomer(personalID int, plateNumber str
 	c := *customers
 
 	customer, idx := c.FindCustomerByPersonalID(personalID)
-	vehiclePersists := vehicles.ensureAbsence(plateNumber)
 
 	if customer == nil && idx == -1 {
 		return fmt.Errorf("Customer with personalID %v doesn't pesists", personalID)
 	}
+
+	vehiclePersists := vehicles.ensureAbsence(plateNumber)
 
 	if vehiclePersists == nil {
 		return fmt.Errorf("Vehicle with plate number %v doesn't persist", plateNumber)
 	}
 
 	customer.RentedCars = append(customer.RentedCars, vehicles[plateNumber])
+
+	return nil
+}
+
+func (customers *Customers) DeleteVehicleFromCustomer(personalID int, plateNumber string, vehicles Vehicles) error {
+	c := *customers
+
+	customer, idx := c.FindCustomerByPersonalID(personalID)
+
+	if customer == nil && idx == -1 {
+		return fmt.Errorf("Customer with personalID %v doesn't exist", personalID)
+	}
+
+	vehiclePersists := vehicles.ensureAbsence(plateNumber)
+
+	if vehiclePersists == nil {
+		return fmt.Errorf("Vehicle with plate number %v doesn't persists", plateNumber)
+	}
+
+	if len(customer.RentedCars) == 0 {
+		return fmt.Errorf("Customer %v %v doesn't have any cars, deletion cannot be executed", customer.FirstName, customer.LastName)
+	}
+
+	if !(slices.Contains(customer.RentedCars, vehicles[plateNumber])) {
+		return fmt.Errorf("Vehicle with plate number %v doesn't persist in %v %v rented vehicles lists", plateNumber, customer.FirstName, customer.LastName)
+	}
+
+	for idx, vehicle := range customer.RentedCars {
+		if vehicle.PlateNumber == plateNumber {
+			customer.RentedCars = append(customer.RentedCars[:idx], customer.RentedCars[idx+1:]...)
+		}
+	}
 
 	return nil
 }
