@@ -4,9 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"net/mail"
+	"os"
 	"slices"
+	"strconv"
 	"time"
 	"unicode"
+
+	"github.com/aquasecurity/table"
 )
 
 type Customer struct {
@@ -230,4 +234,29 @@ func (customers *Customers) DeleteVehicleFromCustomer(personalID int, plateNumbe
 	}
 
 	return nil
+}
+
+func (customers *Customers) PrintCustomersTable() {
+	t := table.New(os.Stdout)
+	c := *customers
+
+	t.SetHeaders("#", "First Name", "Last Name", "Personal ID", "Phone Number", "Email", "Rented Cars", "Created At", "Last Edited")
+
+	for idx, customer := range c {
+		lastEdited := "❌"
+
+		if customer.LastEditedAt != nil {
+			lastEdited = customer.LastEditedAt.Format(time.RFC1123)
+		}
+
+		vehicle := "❌"
+
+		if len(customer.RentedCars) == 1 {
+			vehicle = customer.RentedCars[0].PlateNumber
+		}
+ 
+		t.AddRow(strconv.FormatInt(int64(idx+1), 10), customer.FirstName, customer.LastName, strconv.FormatInt(int64(customer.PersonalID), 10), customer.PhoneNumber, customer.Email, vehicle, customer.CreatedAt.Format(time.RFC1123), lastEdited)
+	}
+
+	t.Render()
 }
