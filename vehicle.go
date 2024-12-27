@@ -3,11 +3,15 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
 	"slices"
+	"strconv"
 	"time"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+
+	"github.com/aquasecurity/table"
 )
 
 type Vehicle struct {
@@ -122,4 +126,20 @@ func (vehicles *Vehicles) DeleteVehicle(plateNumber string) error {
 	delete(v, plateNumber)
 
 	return nil
+}
+
+func (vehicles *Vehicles) PrintVehiclesTable() {
+	v := *vehicles
+	t := table.New(os.Stdout)
+
+	t.SetHeaders("#", "Plate Number", "Make", "Model", "Year", "Fuel Type", "Gearbox", "Color", "Body")
+
+	idx := 0
+	for _, vehicle := range v {
+		t.AddRow(strconv.FormatInt(int64(idx+1), 10), vehicle.PlateNumber, vehicle.Make, vehicle.Model, strconv.FormatInt(int64(vehicle.Year), 10), vehicle.FuelType, vehicle.Gearbox, vehicle.Color, vehicle.Body)
+
+		idx++
+	}
+
+	t.Render()
 }
