@@ -174,6 +174,9 @@ func (customers *Customers) EditCustomerContacts(personalID int, phoneNumber, em
 		customer.Email = email
 	}
 
+	editTime := time.Now()
+	customer.LastEditedAt = &editTime
+
 	return nil
 }
 
