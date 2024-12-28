@@ -16,7 +16,7 @@ import (
 type Customer struct {
 	FirstName    string
 	LastName     string
-	PersonalID   int
+	PersonalID   int64
 	PhoneNumber  string
 	Email        string
 	RentedCars   []Vehicle
@@ -26,7 +26,7 @@ type Customer struct {
 
 type Customers []Customer
 
-func intLength(number int) int {
+func intLength(number int64) int {
 	if number == 0 {
 		return 1
 	}
@@ -41,12 +41,12 @@ func intLength(number int) int {
 	return length
 }
 
-func (customers *Customers) validateInput(firstName, lastName, phoneNumber, email string, personalID int) error {
-	if firstName == "" || len(firstName) <= 3 {
+func (customers *Customers) validateInput(firstName, lastName, phoneNumber, email string, personalID int64) error {
+	if firstName == "" || len(firstName) < 3 {
 		return errors.New("invalid input: first name cannot be empty or shorter than 3 characters")
 	}
 
-	if lastName == "" || len(lastName) <= 3 {
+	if lastName == "" || len(lastName) < 3 {
 		return errors.New("invalid input: last name cannot be empty or shorter than 3 characters")
 	}
 
@@ -91,7 +91,7 @@ func (customers *Customers) validateIdx(idx int) error {
 	return nil
 }
 
-func (customers *Customers) FindCustomerByPersonalID(personalID int) (*Customer, int) {
+func (customers *Customers) FindCustomerByPersonalID(personalID int64) (*Customer, int) {
 	c := *customers
 
 	for idx, customer := range c {
@@ -103,7 +103,7 @@ func (customers *Customers) FindCustomerByPersonalID(personalID int) (*Customer,
 	return nil, -1
 }
 
-func (customers *Customers) AddCustomer(firstName, lastName, phoneNumber, email string, personalID int) error {
+func (customers *Customers) AddCustomer(firstName, lastName, phoneNumber, email string, personalID int64) error {
 	duplicatedCustomer, _ := customers.FindCustomerByPersonalID(personalID)
 
 	if duplicatedCustomer != nil {
@@ -119,7 +119,7 @@ func (customers *Customers) AddCustomer(firstName, lastName, phoneNumber, email 
 	newCustomer := Customer{
 		FirstName:    firstName,
 		LastName:     lastName,
-		PersonalID:   personalID,
+		PersonalID:   int64(personalID),
 		PhoneNumber:  phoneNumber,
 		Email:        email,
 		RentedCars:   []Vehicle{},
@@ -144,7 +144,7 @@ func (customers *Customers) DeleteCustomerByIdx(idx int) error {
 	return fmt.Errorf("unsuccessful validation of idx %v", idx)
 }
 
-func (customers *Customers) DeleteCustomerByPersonalID(personalID int) error {
+func (customers *Customers) DeleteCustomerByPersonalID(personalID int64) error {
 	c := *customers
 	foundCustomer, idx := c.FindCustomerByPersonalID(personalID)
 
@@ -158,7 +158,7 @@ func (customers *Customers) DeleteCustomerByPersonalID(personalID int) error {
 	return nil
 }
 
-func (customers *Customers) EditCustomerContacts(personalID int, phoneNumber, email string) error {
+func (customers *Customers) EditCustomerContacts(personalID int64, phoneNumber, email string) error {
 	c := *customers
 
 	customer, idx := c.FindCustomerByPersonalID(personalID)
@@ -184,7 +184,7 @@ func (customers *Customers) EditCustomerContacts(personalID int, phoneNumber, em
 	return nil
 }
 
-func (customers *Customers) AddVehicleToCustomer(personalID int, plateNumber string, vehicles Vehicles) error {
+func (customers *Customers) AddVehicleToCustomer(personalID int64, plateNumber string, vehicles Vehicles) error {
 	c := *customers
 
 	customer, idx := c.FindCustomerByPersonalID(personalID)
@@ -199,12 +199,16 @@ func (customers *Customers) AddVehicleToCustomer(personalID int, plateNumber str
 		return fmt.Errorf("Vehicle with plate number %v doesn't persist", plateNumber)
 	}
 
+	if slices.Contains(customer.RentedCars, vehicles[plateNumber]) {
+		return fmt.Errorf("Vehicle with plate number %v already exists in customer's rented vehicles", plateNumber)
+	}
+
 	customer.RentedCars = append(customer.RentedCars, vehicles[plateNumber])
 
 	return nil
 }
 
-func (customers *Customers) DeleteVehicleFromCustomer(personalID int, plateNumber string, vehicles Vehicles) error {
+func (customers *Customers) DeleteVehicleFromCustomer(personalID int64, plateNumber string, vehicles Vehicles) error {
 	c := *customers
 
 	customer, idx := c.FindCustomerByPersonalID(personalID)
@@ -230,6 +234,7 @@ func (customers *Customers) DeleteVehicleFromCustomer(personalID int, plateNumbe
 	for idx, vehicle := range customer.RentedCars {
 		if vehicle.PlateNumber == plateNumber {
 			customer.RentedCars = append(customer.RentedCars[:idx], customer.RentedCars[idx+1:]...)
+			return nil
 		}
 	}
 
@@ -254,7 +259,7 @@ func (customers *Customers) PrintCustomersTable() {
 		if len(customer.RentedCars) == 1 {
 			vehicle = customer.RentedCars[0].PlateNumber
 		}
- 
+
 		t.AddRow(strconv.FormatInt(int64(idx+1), 10), customer.FirstName, customer.LastName, strconv.FormatInt(int64(customer.PersonalID), 10), customer.PhoneNumber, customer.Email, vehicle, customer.CreatedAt.Format(time.RFC1123), lastEdited)
 	}
 
