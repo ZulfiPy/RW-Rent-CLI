@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type CmdFlags struct {
+type CustomerCmdFlags struct {
 	Add           string
 	AddVehicle    string
 	Edit          string
@@ -17,8 +17,8 @@ type CmdFlags struct {
 	List          bool
 }
 
-func NewCmdFlags() *CmdFlags {
-	cf := CmdFlags{}
+func CustomersNewCmdFlags() *CustomerCmdFlags {
+	cf := CustomerCmdFlags{}
 
 	flag.StringVar(&cf.Add, "add", "", "Add a new customer using the following format --> firstName:lastName:phoneNumber:email:personalID")
 	flag.StringVar(&cf.AddVehicle, "addVehicle", "", "Add an existing vehicle to a customer using the following format --> personalID:plateNumber")
@@ -32,7 +32,7 @@ func NewCmdFlags() *CmdFlags {
 	return &cf
 }
 
-func (cf *CmdFlags) Execute(customers *Customers, vehicles Vehicles) {
+func (cf *CustomerCmdFlags) Execute(customers *Customers, vehicles Vehicles) {
 	switch {
 	case cf.List:
 		customers.PrintCustomersTable()
