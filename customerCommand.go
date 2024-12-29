@@ -40,7 +40,7 @@ func (cf *CustomerCmdFlags) Execute(customers *Customers, vehicles Vehicles) {
 		parts := strings.SplitN(cf.AddCustomer, ":", 5)
 
 		if len(parts) != 5 {
-			fmt.Println("Error, invalid format for adding the customer. Please provide the whole personal information.")
+			fmt.Println("Error, invalid format for adding a new customer. Please provide the whole personal information.")
 			os.Exit(1)
 		}
 
