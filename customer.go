@@ -256,7 +256,7 @@ func (customers *Customers) PrintCustomersTable() {
 
 		vehicle := "❌"
 
-		if len(customer.RentedCars) == 1 {
+		if len(customer.RentedCars) > 0 {
 			vehicle = customer.RentedCars[0].PlateNumber
 		}
 
