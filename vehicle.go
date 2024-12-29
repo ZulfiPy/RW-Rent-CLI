@@ -28,7 +28,7 @@ type Vehicle struct {
 type Vehicles map[string]Vehicle
 
 func (vehicles *Vehicles) validateVehicle(input Vehicle) error {
-	var fuelType = []string{"Petrol", "Diesel", "Hybrid", "Electric", "LPG", "CNG"}
+	var fuelType = []string{"Petrol", "Diesel", "Hybrid", "Electric", "Lpg", "Cng"}
 	var gearbox = []string{"Automatic", "Manual"}
 	var colors = []string{"White", "Black", "Red", "Blue", "Green", "Yellow", "Gray", "Silver", "Brown"}
 	var bodies = []string{"Sedan", "Touring", "Hatchback", "Minivan", "Coupe", "Cabriolet", "Pickup", "Limousine"}
@@ -55,7 +55,7 @@ func (vehicles *Vehicles) validateVehicle(input Vehicle) error {
 		return errors.New("invalid input: vehicle fuel type may not be empty")
 	}
 
-	if !(slices.Contains(fuelType, caser.String(input.FuelType))) {
+	if !(slices.Contains(fuelType, cases.Title(language.English).String(input.FuelType))) {
 		return errors.New("invalid input: vehicle fuel type may only be (Petrol / Diesel / Hybrid / Electric / LPG / CNG)")
 	}
 
